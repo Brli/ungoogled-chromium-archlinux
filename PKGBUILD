@@ -32,11 +32,13 @@ optdepends=('pipewire: WebRTC desktop sharing under Wayland'
             'kwallet: support for storing passwords in KWallet on Plasma')
 provides=('chromium')
 conflicts=('chromium')
-options=('debug' '!lto') # Chromium adds its own flags for ThinLTO
+options=('!debug' '!lto') # Chromium adds its own flags for ThinLTO
 source=(https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$pkgver.tar.xz
         $pkgname-$_uc_ver.tar.gz::https://github.com/$_uc_usr/ungoogled-chromium/archive/$_uc_ver.tar.gz
         https://github.com/foutrelis/chromium-launcher/archive/v$_launcher_ver/chromium-launcher-$_launcher_ver.tar.gz
         https://github.com/stha09/chromium-patches/releases/download/chromium-${pkgver%%.*}-patchset-$_gcc_patchset/chromium-${pkgver%%.*}-patchset-$_gcc_patchset.tar.xz
+        no-omnibox-suggestion-autocomplete.patch
+        xdg-basedir.patch
         chromium-drirc-disable-10bpc-color-configs.conf
         wayland-egl.patch
         use-oauth2-client-switches-as-default.patch
@@ -50,6 +52,8 @@ sha256sums=('eded233c26ab631be325ad49cb306c338513b6a6528197d42653e66187548e5d'
             '2e07a6833ca7531ee5f64c24e31069192256bad5abbe1091ca12802ba2ad3a75'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
             '1ca780a2ad5351f60671a828064392096c8da7b589086ee999f25c9e6e799a7b'
+            'ff1591fa38e0ede7e883dc7494b813641b7a1a7cb1ded00d9baaee987c1dbea8'
+            'cd844867b5b2197ad097662fee32579a7091dfba1d46cb438c4c7e696690440a'
             'babda4f5c1179825797496898d77334ac067149cac03d797ab27ac69671a7feb'
             '34d08ea93cb4762cb33c7cffe931358008af32265fc720f2762f0179c3973574'
             'e393174d7695d0bafed69e868c5fbfecf07aa6969f3b64596d0bae8b067e1711'
@@ -105,6 +109,14 @@ prepare() {
     third_party/blink/renderer/core/xml/parser/xml_document_parser.cc \
     third_party/libxml/chromium/*.cc \
     third_party/maldoca/src/maldoca/ole/oss_utils.h
+
+  # move ~/.pki directory to ${XDG_DATA_HOME:-$HOME/.local}/share/pki
+  patch -p1 -i ../xdg-basedir.patch
+
+  # You can now set '1' in the flag #omnibox-ui-max-autocomplete-matches to
+  # effectively disable autocompletion in the url bar (and therefore the so-
+  # called 'shoulder surfing').
+  patch -p1 -i ../no-omnibox-suggestion-autocomplete.patch
 
   # Use the --oauth2-client-id= and --oauth2-client-secret= switches for
   # setting GOOGLE_DEFAULT_CLIENT_ID and GOOGLE_DEFAULT_CLIENT_SECRET at
@@ -164,6 +176,10 @@ prepare() {
       \! -regex '.*\.\(gn\|gni\|isolate\)' \
       -delete
   done
+
+  # Minor customization
+  sed '/\(\&baidu*\|&yahoo*\|&bing*\|&yandex*\)/d' -i \
+    components/search_engines/template_url_prepopulate_data.cc
 
   ./build/linux/unbundle/replace_gn_files.py \
     --system-libraries "${!_system_libs[@]}"
