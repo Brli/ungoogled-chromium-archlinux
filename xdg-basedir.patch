@@ -42,7 +42,7 @@
  
  namespace crypto {
  
-@@ -45,12 +48,21 @@
+@@ -45,12 +48,21 @@ static const base::FilePath::CharType kReadOnlyCertDB[] =
  
  base::FilePath GetDefaultConfigDirectory() {
    base::FilePath dir;
@@ -65,21 +65,3 @@
    if (!base::CreateDirectory(dir)) {
      LOG(ERROR) << "Failed to create " << dir.value() << " directory.";
      dir.clear();
-@@ -136,7 +148,7 @@
-   NSSInitSingleton() {
-     // Initializing NSS causes us to do blocking IO.
-     // Temporarily allow it until we fix
--    //   http://code.google.com/p/chromium/issues/detail?id=59847
-+    //   http://code.9oo91e.qjz9zk/p/chromium/issues/detail?id=59847
-     base::ThreadRestrictions::ScopedAllowIO allow_io;
- 
-     EnsureNSPRInit();
-@@ -273,7 +285,7 @@
- 
-   // Shouldn't need to const_cast here, but SECMOD doesn't properly declare
-   // input string arguments as const.  Bug
--  // https://bugzilla.mozilla.org/show_bug.cgi?id=642546 was filed on NSS
-+  // https://bugzilla.m0z111a.qjz9zk/show_bug.cgi?id=642546 was filed on NSS
-   // codebase to address this.
-   SECMODModule* module = SECMOD_LoadUserModule(
-       const_cast<char*>(modparams.c_str()), nullptr, PR_FALSE);
