@@ -58,7 +58,7 @@
      return dir;
    }
 +#if defined(OS_LINUX)
-+  dir = dir.Append(chrome::kBrowserProcessExecutableName).AppendASCII("pki").AppendASCII("nssdb");
++  dir = dir.AppendASCII("chromium").AppendASCII("pki").AppendASCII("nssdb");
 +#else
    dir = dir.AppendASCII(".pki").AppendASCII("nssdb");
 +#endif
