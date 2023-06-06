@@ -14,7 +14,7 @@ pkgrel=1
 _launcher_ver=8
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
-_uc_ver=113.0.5672.126-1
+_uc_ver=114.0.5735.90-1
 pkgdesc="A lightweight approach to removing Google web service dependency"
 arch=('x86_64')
 url="https://github.com/ungoogled-software/ungoogled-chromium"
@@ -45,11 +45,10 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         webauthn-variant.patch
         random-fixes-for-gcc13.patch
         add-some-typename-s-that-are-required-in-C-17.patch
-        REVERT-disable-autoupgrading-debug-info.patch
         fix-autocomplete-controller-build-with-tflite-lib-disabled.patch
-        uc-upgrade-to-114.0.5735.90.patch)
+        REVERT-disable-autoupgrading-debug-info.patch)
 sha256sums=('40b0c2341ce26969db4821f26fc88f0d57b9fffa80224a30128ca4f8282802b2'
-            '1025329c38041b3b8b200fe3405d4b873345e87cba6333e036b83ad2f0000d3e'
+            'a96154372365e63444b4a3ee069636b53f59b74513e6d1a4e217713eb059db67'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
             'ff1591fa38e0ede7e883dc7494b813641b7a1a7cb1ded00d9baaee987c1dbea8'
             'e6d6bf932e66dbb0a9a08b80cafe53f9cfdbe69c6acc1819b51253fdd5a1ad93'
@@ -62,8 +61,7 @@ sha256sums=('40b0c2341ce26969db4821f26fc88f0d57b9fffa80224a30128ca4f8282802b2'
             'ba4dd0a25a4fc3267ed19ccb39f28b28176ca3f97f53a4e9f5e9215280040ea0'
             '621ed210d75d0e846192c1571bb30db988721224a41572c27769c0288d361c11'
             '1b782b0f6d4f645e4e0daa8a4852d63f0c972aa0473319216ff04613a0592a69'
-            '362f1c9abbcc3a9c69ffc6213b382bd279659e88a7e07a9e644c5e76c097d3cb'
-            '58a224b0666233941fbfbf81fbe7bea5f602182a14d1ad70bb41126729fbb303')
+            '362f1c9abbcc3a9c69ffc6213b382bd279659e88a7e07a9e644c5e76c097d3cb')
 
 # Possible replacements are listed in build/linux/unbundle/replace_gn_files.py
 # Keys are the names in the above script; values are the dependencies in Arch
@@ -151,9 +149,6 @@ prepare() {
   # Ungoogled Chromium changes
   _ungoogled_repo="$srcdir/$pkgname-$_uc_ver"
   _utils="${_ungoogled_repo}/utils"
-  msg2 'Patching ungoogled-chromium source'
-  sed 's,113.0.5672.126,113.0.5672.127,' -i "$_ungoogled_repo/chromium_version.txt"
-  patch -p1 -i "$srcdir/uc-upgrade-to-114.0.5735.90.patch" -d "$_ungoogled_repo"
   msg2 'Pruning binaries'
   python "$_utils/prune_binaries.py" ./ "$_ungoogled_repo/pruning.list"
   msg2 'Applying patches'
