@@ -9,12 +9,12 @@
 # Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
 
 pkgname=ungoogled-chromium
-pkgver=114.0.5735.91
+pkgver=114.0.5735.198
 pkgrel=1
 _launcher_ver=8
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
-_uc_ver=114.0.5735.90-1
+_uc_ver=114.0.5735.198-1
 pkgdesc="A lightweight approach to removing Google web service dependency"
 arch=('x86_64')
 url="https://github.com/ungoogled-software/ungoogled-chromium"
@@ -47,8 +47,8 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         add-some-typename-s-that-are-required-in-C-17.patch
         fix-autocomplete-controller-build-with-tflite-lib-disabled.patch
         REVERT-disable-autoupgrading-debug-info.patch)
-sha256sums=('40b0c2341ce26969db4821f26fc88f0d57b9fffa80224a30128ca4f8282802b2'
-            'a96154372365e63444b4a3ee069636b53f59b74513e6d1a4e217713eb059db67'
+sha256sums=('a9f3440feeab51f56b199797b83b458ca545bf67e114c62b21470fadd5a41dea'
+            '3b22dcd4caebea5f1c72ea4437e67784d6b740a4624b15002078a6daf05235a1'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
             'ff1591fa38e0ede7e883dc7494b813641b7a1a7cb1ded00d9baaee987c1dbea8'
             'e6d6bf932e66dbb0a9a08b80cafe53f9cfdbe69c6acc1819b51253fdd5a1ad93'
