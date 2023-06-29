@@ -45,7 +45,6 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         webauthn-variant.patch
         random-fixes-for-gcc13.patch
         add-some-typename-s-that-are-required-in-C-17.patch
-        fix-autocomplete-controller-build-with-tflite-lib-disabled.patch
         REVERT-disable-autoupgrading-debug-info.patch)
 sha256sums=('a9f3440feeab51f56b199797b83b458ca545bf67e114c62b21470fadd5a41dea'
             '3b22dcd4caebea5f1c72ea4437e67784d6b740a4624b15002078a6daf05235a1'
@@ -60,7 +59,6 @@ sha256sums=('a9f3440feeab51f56b199797b83b458ca545bf67e114c62b21470fadd5a41dea'
             '590fabbb26270947cb477378b53a9dcd17855739076b4af9983e1e54dfcab6d7'
             'ba4dd0a25a4fc3267ed19ccb39f28b28176ca3f97f53a4e9f5e9215280040ea0'
             '621ed210d75d0e846192c1571bb30db988721224a41572c27769c0288d361c11'
-            '362f1c9abbcc3a9c69ffc6213b382bd279659e88a7e07a9e644c5e76c097d3cb'
             '1b782b0f6d4f645e4e0daa8a4852d63f0c972aa0473319216ff04613a0592a69')
 
 
@@ -128,7 +126,6 @@ prepare() {
 
   # Revert addition of compiler flag that needs newer clang
   patch -Rp1 -i ../REVERT-disable-autoupgrading-debug-info.patch
-  patch -p1 -i ../fix-autocomplete-controller-build-with-tflite-lib-disabled.patch
 
   # Disable kGlobalMediaControlsCastStartStop by default
   # https://crbug.com/1314342
