@@ -9,12 +9,13 @@
 # Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
 
 pkgname=ungoogled-chromium
-pkgver=114.0.5735.198
+pkgver=115.0.5790.102
 pkgrel=1
 _launcher_ver=8
+_gcc_patchset=2
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
-_uc_ver=114.0.5735.198-1
+_uc_ver=115.0.5790.102-1
 pkgdesc="A lightweight approach to removing Google web service dependency"
 arch=('x86_64')
 url="https://github.com/ungoogled-software/ungoogled-chromium"
@@ -37,29 +38,23 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         https://github.com/foutrelis/chromium-launcher/archive/v$_launcher_ver/chromium-launcher-$_launcher_ver.tar.gz
         no-omnibox-suggestion-autocomplete.patch
         xdg-basedir.patch
+        https://github.com/stha09/chromium-patches/releases/download/chromium-${pkgver%%.*}-patchset-$_gcc_patchset/chromium-${pkgver%%.*}-patchset-$_gcc_patchset.tar.xz
         chromium-drirc-disable-10bpc-color-configs.conf
         use-oauth2-client-switches-as-default.patch
         ozone-add-va-api-support-to-wayland.patch
-        disable-GlobalMediaControlsCastStartStop.patch
-        download-bubble-typename.patch
-        webauthn-variant.patch
-        random-fixes-for-gcc13.patch
-        add-some-typename-s-that-are-required-in-C-17.patch
-        REVERT-disable-autoupgrading-debug-info.patch)
-sha256sums=('a9f3440feeab51f56b199797b83b458ca545bf67e114c62b21470fadd5a41dea'
-            '3b22dcd4caebea5f1c72ea4437e67784d6b740a4624b15002078a6daf05235a1'
+        REVERT-disable-autoupgrading-debug-info.patch
+        random-build-fixes.patch)
+sha256sums=('06f6e0f22b3a0122eaf5b50a8f603648dc37e7b1178b65ef54e93162b386b06b'
+            '56a4c2fbbe5fca51683edf1cb543d83e740331d948ec02a65efb71a824d60110'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
             'ff1591fa38e0ede7e883dc7494b813641b7a1a7cb1ded00d9baaee987c1dbea8'
             'e6d6bf932e66dbb0a9a08b80cafe53f9cfdbe69c6acc1819b51253fdd5a1ad93'
+            '4f91bd10a8ae2aa7b040a8b27e01f38910ad33cbe179e39a1ae550c9c1523384'
             'babda4f5c1179825797496898d77334ac067149cac03d797ab27ac69671a7feb'
             'e393174d7695d0bafed69e868c5fbfecf07aa6969f3b64596d0bae8b067e1711'
             'af20fc58aef22dd0b1fb560a1fab68d0d27187ff18fad7eb1670feab9bc4a8d8'
-            '7f3b1b22d6a271431c1f9fc92b6eb49c6d80b8b3f868bdee07a6a1a16630a302'
-            'd464eed4be4e9bf6187b4c40a759c523b7befefa25ba34ad6401b2a07649ca2a'
-            '590fabbb26270947cb477378b53a9dcd17855739076b4af9983e1e54dfcab6d7'
-            'ba4dd0a25a4fc3267ed19ccb39f28b28176ca3f97f53a4e9f5e9215280040ea0'
-            '621ed210d75d0e846192c1571bb30db988721224a41572c27769c0288d361c11'
-            '1b782b0f6d4f645e4e0daa8a4852d63f0c972aa0473319216ff04613a0592a69')
+            '1b782b0f6d4f645e4e0daa8a4852d63f0c972aa0473319216ff04613a0592a69'
+            'fd472e8c2a68b2d13ce6cab1db99818d7043e49cecf807bf0c5fc931f0c036a3')
 
 
 # Possible replacements are listed in build/linux/unbundle/replace_gn_files.py
@@ -122,19 +117,21 @@ prepare() {
   patch -Np1 -i ../use-oauth2-client-switches-as-default.patch
 
   # Upstream fixes
-  patch -Np1 -i ../add-some-typename-s-that-are-required-in-C-17.patch
 
   # Revert addition of compiler flag that needs newer clang
   patch -Rp1 -i ../REVERT-disable-autoupgrading-debug-info.patch
 
-  # Disable kGlobalMediaControlsCastStartStop by default
-  # https://crbug.com/1314342
-  patch -Np1 -i ../disable-GlobalMediaControlsCastStartStop.patch
-
   # Build fixes
-  patch -Np1 -i ../download-bubble-typename.patch
-  patch -Np1 -i ../webauthn-variant.patch
-  patch -Np1 -i ../random-fixes-for-gcc13.patch
+  patch -Np1 -i ../random-build-fixes.patch
+
+  # Fixes for building with libstdc++ instead of libc++
+  patch -Np1 -i ../patches/chromium-114-ruy-include.patch
+  patch -Np1 -i ../patches/chromium-114-tflite-include.patch
+  patch -Np1 -i ../patches/chromium-114-vk_mem_alloc-include.patch
+  patch -Np1 -i ../patches/chromium-115-skia-include.patch
+  patch -Np1 -i ../patches/chromium-114-maldoca-include.patch
+  patch -Np1 -i ../patches/chromium-115-verify_name_match-include.patch
+
 
   # Link to system tools required by the build
   mkdir -p third_party/node/linux/node-linux-x64/bin
@@ -210,6 +207,7 @@ build() {
     'use_system_libffi=true'
     'use_custom_libcxx=false'
     'enable_widevine=true'
+    'enable_rust=false'
     'use_vaapi=true'
     'enable_platform_hevc=true'
     'enable_hevc_parser_and_hw_decoder=true'
