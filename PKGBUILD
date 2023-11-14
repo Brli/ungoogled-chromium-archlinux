@@ -9,12 +9,12 @@
 # Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
 
 pkgname=ungoogled-chromium
-pkgver=118.0.5993.70
+pkgver=119.0.6045.123
 pkgrel=1
 _launcher_ver=8
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
-_uc_ver=118.0.5993.70-1
+_uc_ver=119.0.6045.123-1
 pkgdesc="A lightweight approach to removing Google web service dependency"
 arch=('x86_64')
 url="https://github.com/ungoogled-software/ungoogled-chromium"
@@ -27,6 +27,7 @@ makedepends=('python' 'gn' 'ninja' 'clang' 'lld' 'gperf' 'nodejs' 'pipewire'
 optdepends=('pipewire: WebRTC desktop sharing under Wayland'
             'kdialog: support for native dialogs in Plasma'
             'qt5-base: enable Qt5 with --enable-features=AllowQt'
+            'gtk4: for --gtk-version=4 (GTK4 IME might work better on Wayland)'
             'org.freedesktop.secrets: password storage backend on GNOME / Xfce'
             'kwallet: support for storing passwords in KWallet on Plasma')
 provides=('chromium')
@@ -40,18 +41,16 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         https://gitlab.com/Matt.Jolly/chromium-patches/-/archive/${pkgver%%.*}/chromium-patches-${pkgver%%.*}.tar.bz2
         chromium-drirc-disable-10bpc-color-configs.conf
         use-oauth2-client-switches-as-default.patch
-        REVERT-disable-autoupgrading-debug-info.patch
-        free-the-X11-pixmap-in-the-NativePixmapEGLX11Bind.patch)
-sha256sums=('49ee00a734de3dae7c421eb3c974e8d451b4de6f5b4e34b603fd6435eab6993d'
-            'd95a02dc7bad01302ed42c9f50daee53c998149f14ba6a4023198e7b1c6f5a36'
+        REVERT-disable-autoupgrading-debug-info.patch)
+sha256sums=('6b61b87d0a201113b9c4e3d0ce48df52ecf869179c207e34b71add957fb7b48f'
+            'e20df54944837fc5097369b3c52b6d6922c1a32a57f25769c5bbff8a4db8bebe'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
             'ff1591fa38e0ede7e883dc7494b813641b7a1a7cb1ded00d9baaee987c1dbea8'
             'e6d6bf932e66dbb0a9a08b80cafe53f9cfdbe69c6acc1819b51253fdd5a1ad93'
-            '0d1eb054965711a2d4ed6b4cb7f06cbda5b374a48e1b99c8c38ebf6375a781a9'
+            '09ecf142254525ddb9c2dbbb2c71775e68722412923a5a9bba5cc2e46af8d087'
             'babda4f5c1179825797496898d77334ac067149cac03d797ab27ac69671a7feb'
             'e393174d7695d0bafed69e868c5fbfecf07aa6969f3b64596d0bae8b067e1711'
-            '1b782b0f6d4f645e4e0daa8a4852d63f0c972aa0473319216ff04613a0592a69'
-            'ab1eb107ec1c915065dc59cf4832da27e17d60eb29038e2aec633daeb946cc6a')
+            '1b782b0f6d4f645e4e0daa8a4852d63f0c972aa0473319216ff04613a0592a69')
 
 
 # Possible replacements are listed in build/linux/unbundle/replace_gn_files.py
@@ -67,7 +66,7 @@ declare -gA _system_libs=(
   [icu]=icu
   [jsoncpp]=jsoncpp
   #[libaom]=aom
-  [libavif]=libavif
+  #[libavif]=libavif  # needs https://github.com/AOMediaCodec/libavif/commit/5410b23f76
   [libdrm]=
   [libjpeg]=libjpeg
   [libpng]=libpng
@@ -114,19 +113,17 @@ prepare() {
   patch -Np1 -i ../use-oauth2-client-switches-as-default.patch
 
   # Upstream fixes
-  patch -Np1 -i ../free-the-X11-pixmap-in-the-NativePixmapEGLX11Bind.patch
 
   # Revert addition of compiler flag that needs newer clang
   patch -Rp1 -i ../REVERT-disable-autoupgrading-debug-info.patch
 
   # Fixes for building with libstdc++ instead of libc++
-  patch -Np1 -i ../chromium-patches-*/chromium-114-maldoca-include.patch
   patch -Np1 -i ../chromium-patches-*/chromium-114-ruy-include.patch
   patch -Np1 -i ../chromium-patches-*/chromium-114-vk_mem_alloc-include.patch
   patch -Np1 -i ../chromium-patches-*/chromium-117-material-color-include.patch
-  patch -Np1 -i ../chromium-patches-*/chromium-118-SensorReadingField-include.patch
-  patch -Np1 -i ../chromium-patches-*/chromium-118-LightweightDetector-include.patch
-  patch -Np1 -i ../chromium-patches-*/chromium-118-system-freetype.patch
+  patch -Np1 -i ../chromium-patches-*/chromium-119-FragmentDataIterator-std.patch
+  patch -Np1 -i ../chromium-patches-*/chromium-119-at-spi-variable-consumption.patch
+  patch -Np1 -i ../chromium-patches-*/chromium-119-clang16.patch
 
   # Link to system tools required by the build
   mkdir -p third_party/node/linux/node-linux-x64/bin
