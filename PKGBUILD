@@ -9,12 +9,12 @@
 # Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
 
 pkgname=ungoogled-chromium
-pkgver=120.0.6099.199
+pkgver=120.0.6099.224
 pkgrel=1
 _launcher_ver=8
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
-_uc_ver=120.0.6099.199-1
+_uc_ver=120.0.6099.224-1
 pkgdesc="A lightweight approach to removing Google web service dependency"
 arch=('x86_64')
 url="https://github.com/ungoogled-software/ungoogled-chromium"
@@ -43,9 +43,14 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         use-oauth2-client-switches-as-default.patch
         libxml2-2.12.patch
         drop-flags-unsupported-by-clang16.patch
-        icu-74.patch)
-sha256sums=('84009db5c898517f38f7b44b81b8a98e21fd28ca3f9aad9dda07516d8640574c'
-            '33cf5428b87e9046172a714ab119ddc750eb83f3ef72f3d6187d38671c02f91a'
+        icu-74.patch
+        0001-adjust-buffer-format-order.patch
+        0001-enable-linux-unstable-deb-target.patch
+        0001-ozone-wayland-implement-text_input_manager_v3.patch
+        0001-ozone-wayland-implement-text_input_manager-fixes.patch
+        0001-vaapi-flag-ozone-wayland.patch)
+sha256sums=('850a85c8d8a01041a07dfaaea8289fa5f8294b4e375e6b77997b61434e0a2f1a'
+            'b96fd3d5d64ffd5efa3bc52966adfd7fd1dd3e85ebf3517924054b577ac03750'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
             'ff1591fa38e0ede7e883dc7494b813641b7a1a7cb1ded00d9baaee987c1dbea8'
             'e6d6bf932e66dbb0a9a08b80cafe53f9cfdbe69c6acc1819b51253fdd5a1ad93'
@@ -54,7 +59,12 @@ sha256sums=('84009db5c898517f38f7b44b81b8a98e21fd28ca3f9aad9dda07516d8640574c'
             'e393174d7695d0bafed69e868c5fbfecf07aa6969f3b64596d0bae8b067e1711'
             '1808df5ba4d1e2f9efa07ac6b510bec866fa6d60e44505d82aea3f6072105a71'
             '8d1cdf3ddd8ff98f302c90c13953f39cd804b3479b13b69b8ef138ac57c83556'
-            'ff9ebd86b0010e1c604d47303ab209b1d76c3e888c423166779cefbc22de297f')
+            'ff9ebd86b0010e1c604d47303ab209b1d76c3e888c423166779cefbc22de297f'
+            '8ba5c67b7eb6cacd2dbbc29e6766169f0fca3bbb07779b1a0a76c913f17d343f'
+            '2a44756404e13c97d000cc0d859604d6848163998ea2f838b3b9bb2c840967e3'
+            'd9974ddb50777be428fd0fa1e01ffe4b587065ba6adefea33678e1b3e25d1285'
+            'a2da75d0c20529f2d635050e0662941c0820264ea9371eb900b9d90b5968fa6a'
+            '9a5594293616e1390462af1f50276ee29fd6075ffab0e3f944f6346cb2eb8aec')
 
 
 # Possible replacements are listed in build/linux/unbundle/replace_gn_files.py
