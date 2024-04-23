@@ -9,13 +9,13 @@
 # Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
 
 pkgname=ungoogled-chromium
-pkgver=123.0.6312.105
+pkgver=124.0.6367.60
 pkgrel=1
 _launcher_ver=8
 _system_clang=1
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
-_uc_ver=123.0.6312.105-1
+_uc_ver=124.0.6367.60-1
 pkgdesc="A lightweight approach to removing Google web service dependency"
 arch=('x86_64')
 url="https://github.com/ungoogled-software/ungoogled-chromium"
@@ -49,10 +49,10 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         0001-vaapi-flag-ozone-wayland.patch
         drop-flag-unsupported-by-clang17.patch
         compiler-rt-adjust-paths.patch)
-sha256sums=('0a14fba1fb1a288d99b188160e3138295aa8604bdf492e62a94c0ec35a4e229d'
-            '4786ed32d19a0c960ce8aa4a2c87ea80b9527d1bbcbcf6b3a18a253efe3b667b'
+sha256sums=('ebd553527149cb8477a522df90acd6cea2388a6f431e2db589a0301df1d0cae2'
+            '10996c17d79b4bf1baccc3138e6103c39379ca2f5bdc72092e67e4dda7a527a7'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
-            '488f02af92b148eaa91ad5015b3bf383dfc8618ebafe9c3c250cd4c7f4e27b19'
+            'c2bc4e65ed2a4e23528dd10d5c15bf99f880b7bbb789cc720d451b78098a7e12'
             'babda4f5c1179825797496898d77334ac067149cac03d797ab27ac69671a7feb'
             'e393174d7695d0bafed69e868c5fbfecf07aa6969f3b64596d0bae8b067e1711'
             '8ba5c67b7eb6cacd2dbbc29e6766169f0fca3bbb07779b1a0a76c913f17d343f'
@@ -82,7 +82,7 @@ declare -gA _system_libs=(
   [libjpeg]=libjpeg
   [libpng]=libpng
   #[libvpx]=libvpx
-  [libwebp]=libwebp
+  #[libwebp]=libwebp  # //third_party/libavif:libavif_enc needs //third_party/libwebp:libwebp_sharpyuv
   [libxml]=libxml2
   [libxslt]=libxslt
   [opus]=opus
