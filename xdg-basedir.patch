@@ -4,16 +4,15 @@
 
 --- a/base/nix/xdg_util.cc
 +++ b/base/nix/xdg_util.cc
-@@ -29,6 +29,8 @@
- const char kXdgConfigHomeEnvVar[] = "XDG_CONFIG_HOME";
- const char kXdgCurrentDesktopEnvVar[] = "XDG_CURRENT_DESKTOP";
+@@ -47,6 +47,8 @@ const char kXdgCurrentDesktopEnvVar[] = "XDG_CURRENT_DESKTOP";
  const char kXdgSessionTypeEnvVar[] = "XDG_SESSION_TYPE";
+ const char kXdgActivationTokenEnvVar[] = "XDG_ACTIVATION_TOKEN";
+ const char kXdgActivationTokenSwitch[] = "xdg-activation-token";
 +const char kDotDataDir[] = ".local/share";
 +const char kXdgDataHomeEnvVar[] = "XDG_DATA_HOME";
- 
- FilePath GetXDGDirectory(Environment* env, const char* env_name,
-                          const char* fallback_dir) {
 
+ FilePath GetXDGDirectory(Environment* env,
+                          const char* env_name,
 --- a/base/nix/xdg_util.h
 +++ b/base/nix/xdg_util.h
 @@ -37,6 +37,12 @@
