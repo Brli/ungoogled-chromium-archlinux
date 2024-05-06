@@ -9,13 +9,13 @@
 # Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
 
 pkgname=ungoogled-chromium
-pkgver=124.0.6367.60
+pkgver=124.0.6367.118
 pkgrel=1
 _launcher_ver=8
 _system_clang=1
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
-_uc_ver=124.0.6367.60-1
+_uc_ver=124.0.6367.118-1
 pkgdesc="A lightweight approach to removing Google web service dependency"
 arch=('x86_64')
 url="https://github.com/ungoogled-software/ungoogled-chromium"
@@ -24,10 +24,9 @@ depends=('gtk3' 'nss' 'alsa-lib' 'xdg-utils' 'libxss' 'libcups' 'libgcrypt'
          'ttf-liberation' 'systemd' 'dbus' 'libpulse' 'pciutils' 'libva'
          'libffi' 'desktop-file-utils' 'hicolor-icon-theme')
 makedepends=('python' 'gn' 'ninja' 'clang' 'lld' 'gperf' 'nodejs' 'pipewire'
-             'rust' 'qt5-base' 'java-runtime-headless' 'git')
+             'rust' 'qt5-base' 'qt6-base' 'java-runtime-headless' 'git')
 optdepends=('pipewire: WebRTC desktop sharing under Wayland'
             'kdialog: support for native dialogs in Plasma'
-            'qt5-base: enable Qt5 with --enable-features=AllowQt'
             'gtk4: for --gtk-version=4 (GTK4 IME might work better on Wayland)'
             'org.freedesktop.secrets: password storage backend on GNOME / Xfce'
             'kwallet: support for storing passwords in KWallet on Plasma')
@@ -48,9 +47,11 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         0001-ozone-wayland-implement-text_input_manager-fixes.patch
         0001-vaapi-flag-ozone-wayland.patch
         drop-flag-unsupported-by-clang17.patch
-        compiler-rt-adjust-paths.patch)
-sha256sums=('ebd553527149cb8477a522df90acd6cea2388a6f431e2db589a0301df1d0cae2'
-            '10996c17d79b4bf1baccc3138e6103c39379ca2f5bdc72092e67e4dda7a527a7'
+        compiler-rt-adjust-paths.patch
+        qt-6.7.patch
+        fix-a-missing-build-dependency.patch)
+sha256sums=('8aa5a14aad1234b48b568da9ef23d6e0b1b72d7f4ca5c4039462e54e6ad45d96'
+            'f56909f5071bac41c2c727ff217056925922125096d13a0cfcdce231adebe6f1'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
             'c2bc4e65ed2a4e23528dd10d5c15bf99f880b7bbb789cc720d451b78098a7e12'
             'ff1591fa38e0ede7e883dc7494b813641b7a1a7cb1ded00d9baaee987c1dbea8'
@@ -63,7 +64,9 @@ sha256sums=('ebd553527149cb8477a522df90acd6cea2388a6f431e2db589a0301df1d0cae2'
             'a2da75d0c20529f2d635050e0662941c0820264ea9371eb900b9d90b5968fa6a'
             '9a5594293616e1390462af1f50276ee29fd6075ffab0e3f944f6346cb2eb8aec'
             '3bd35dab1ded5d9e1befa10d5c6c4555fe0a76d909fb724ac57d0bf10cb666c1'
-            'b3de01b7df227478687d7517f61a777450dca765756002c80c4915f271e2d961')
+            'b3de01b7df227478687d7517f61a777450dca765756002c80c4915f271e2d961'
+            'e30623f36c54f4af3a8aa7d9400f7d2bed6ef560f15d665d2aa8fd777cb2565f'
+            '75e1482d1b27c34ebe9d4bf27104fedcc219cdd95ce71fc41e77a486befd3f93')
 
 
 # Possible replacements are listed in build/linux/unbundle/replace_gn_files.py
@@ -126,12 +129,16 @@ prepare() {
   patch -Np1 -i ../use-oauth2-client-switches-as-default.patch
 
   # Upstream fixes
+  patch -Np1 -i ../fix-a-missing-build-dependency.patch
 
   # Drop compiler flag that needs newer clang
   patch -Np1 -i ../drop-flag-unsupported-by-clang17.patch
 
   # Allow libclang_rt.builtins from compiler-rt >= 16 to be used
   patch -Np1 -i ../compiler-rt-adjust-paths.patch
+
+  # Fix build with Qt 6.7
+  patch -Np1 -i ../qt-6.7.patch
 
   # Fixes for building with libstdc++ instead of libc++
   patch -Np1 -i ../chromium-patches-*/chromium-117-material-color-include.patch
@@ -220,6 +227,8 @@ build() {
     'use_sysroot=false'
     'use_system_libffi=true'
     'enable_widevine=true'
+    'use_qt6=true'
+    'moc_qt6_path="/usr/lib/qt6"'
     'use_vaapi=true'
     'enable_platform_hevc=true'
     'enable_hevc_parser_and_hw_decoder=true'
@@ -334,6 +343,7 @@ package() {
     chrome_200_percent.pak
     chrome_crashpad_handler
     libqt5_shim.so
+    libqt6_shim.so
     resources.pak
     v8_context_snapshot.bin
 
