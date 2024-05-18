@@ -9,13 +9,13 @@
 # Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
 
 pkgname=ungoogled-chromium
-pkgver=124.0.6367.118
+pkgver=124.0.6367.207
 pkgrel=1
 _launcher_ver=8
 _system_clang=1
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
-_uc_ver=124.0.6367.118-1
+_uc_ver=124.0.6367.207-1
 pkgdesc="A lightweight approach to removing Google web service dependency"
 arch=('x86_64')
 url="https://github.com/ungoogled-software/ungoogled-chromium"
@@ -48,10 +48,10 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         0001-vaapi-flag-ozone-wayland.patch
         drop-flag-unsupported-by-clang17.patch
         compiler-rt-adjust-paths.patch
-        qt-6.7.patch
-        fix-a-missing-build-dependency.patch)
-sha256sums=('8aa5a14aad1234b48b568da9ef23d6e0b1b72d7f4ca5c4039462e54e6ad45d96'
-            'f56909f5071bac41c2c727ff217056925922125096d13a0cfcdce231adebe6f1'
+        fix-a-missing-build-dependency.patch
+        ninja-out-of-order-generation-fix.patch)
+sha256sums=('6d6dc8b943012573a244ddb013b281ecbc97f77fe1fc6f55a4118241d107eba5'
+            'e109631651affdaae2ddc22cc1e81f56d8c7eb583f816c6ee7de21d97977315b'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
             'c2bc4e65ed2a4e23528dd10d5c15bf99f880b7bbb789cc720d451b78098a7e12'
             'ff1591fa38e0ede7e883dc7494b813641b7a1a7cb1ded00d9baaee987c1dbea8'
@@ -65,8 +65,8 @@ sha256sums=('8aa5a14aad1234b48b568da9ef23d6e0b1b72d7f4ca5c4039462e54e6ad45d96'
             '9a5594293616e1390462af1f50276ee29fd6075ffab0e3f944f6346cb2eb8aec'
             '3bd35dab1ded5d9e1befa10d5c6c4555fe0a76d909fb724ac57d0bf10cb666c1'
             'b3de01b7df227478687d7517f61a777450dca765756002c80c4915f271e2d961'
-            'e30623f36c54f4af3a8aa7d9400f7d2bed6ef560f15d665d2aa8fd777cb2565f'
-            '75e1482d1b27c34ebe9d4bf27104fedcc219cdd95ce71fc41e77a486befd3f93')
+            '75e1482d1b27c34ebe9d4bf27104fedcc219cdd95ce71fc41e77a486befd3f93'
+            '813e6a1209ab72e4ab34f5f062412087e9664189d7b8f1dc1d0bb9481c574c45')
 
 
 # Possible replacements are listed in build/linux/unbundle/replace_gn_files.py
@@ -137,8 +137,8 @@ prepare() {
   # Allow libclang_rt.builtins from compiler-rt >= 16 to be used
   patch -Np1 -i ../compiler-rt-adjust-paths.patch
 
-  # Fix build with Qt 6.7
-  patch -Np1 -i ../qt-6.7.patch
+  # Fix ninja 1.12 generating files out of order
+  patch -Np1 -i ../ninja-out-of-order-generation-fix.patch
 
   # Fixes for building with libstdc++ instead of libc++
   patch -Np1 -i ../chromium-patches-*/chromium-117-material-color-include.patch
