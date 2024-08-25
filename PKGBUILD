@@ -9,13 +9,13 @@
 # Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
 
 pkgname=ungoogled-chromium
-pkgver=127.0.6533.72
-pkgrel=6
+pkgver=128.0.6613.84
+pkgrel=2
 _launcher_ver=8
 _system_clang=1
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
-_uc_ver=127.0.6533.72-1
+_uc_ver=128.0.6613.84-1
 pkgdesc="A lightweight approach to removing Google web service dependency"
 arch=('x86_64')
 url="https://github.com/ungoogled-software/ungoogled-chromium"
@@ -41,9 +41,7 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         https://gitlab.com/Matt.Jolly/chromium-patches/-/archive/${pkgver%%.*}/chromium-patches-${pkgver%%.*}.tar.bz2
         no-omnibox-suggestion-autocomplete.patch
         xdg-basedir.patch
-        chromium-drirc-disable-10bpc-color-configs.conf
         allow-ANGLEImplementation-kVulkan.patch
-        chromium-browser-ui-missing-deps.patch
         compiler-rt-adjust-paths.patch
         increase-fortify-level.patch
         use-oauth2-client-switches-as-default.patch
@@ -52,16 +50,12 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         0001-ozone-wayland-implement-text_input_manager_v3.patch
         0001-ozone-wayland-implement-text_input_manager-fixes.patch
         0001-vaapi-flag-ozone-wayland.patch)
-sha256sums=('7f21f1bfc89e1a2c474463ef950b72e6401d1375cf3c17d907bf3d346720efbe'
-            '45ce5780948b1348c21b23efbc93a78ec2b706a469856a7d0e4c9afbfaea601e'
+sha256sums=('9297c1e1dc9310534f6a48f90eacc2eac1d964ac3c827dc0798594e8a2742dc4'
+            'a6898d0cf47025126a8795947397ee35a10a623fdbe0c8616c1dfcca51ebe500'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
-            'daf0df74d2601c35fd66a746942d9ca3fc521ede92312f85af51d94c399fd6e0'
             'ff1591fa38e0ede7e883dc7494b813641b7a1a7cb1ded00d9baaee987c1dbea8'
             'eedfdfcdd22acc5797b73e1285e31b8ba3562fdd7fda6ac82171fb66a440c1e4'
-            'babda4f5c1179825797496898d77334ac067149cac03d797ab27ac69671a7feb'
-            '0887d215c47085013d09252409964a5eedec453561db1f2b133914e349b8a0b2'
-            '8f81059d79040ec598b5fb077808ec69d26d6c9cbebf9c4f4ea48b388a2596c5'
-            '75f9c3ccdcc914d029ddcc5ca181df90177db35a343bf44ff541ff127bcea43d'
+            '1a5bc75a90abad153c8eb6dbdce138132a5f11190b0a40c925958a72d706b2aa'
             'b3de01b7df227478687d7517f61a777450dca765756002c80c4915f271e2d961'
             'd634d2ce1fc63da7ac41f432b1e84c59b7cceabf19d510848a7cff40c8025342'
             'a9b417b96daec33c9059065e15b3a92ae1bf4b59f89d353659b335d9e0379db6'
@@ -85,7 +79,7 @@ declare -gA _system_libs=(
   [icu]=icu
   #[jsoncpp]=jsoncpp  # needs libstdc++
   #[libaom]=aom
-  #[libavif]=libavif  # needs https://github.com/AOMediaCodec/libavif/commit/5410b23f76
+  #[libavif]=libavif  # needs -DAVIF_ENABLE_EXPERIMENTAL_GAIN_MAP=ON
   [libdrm]=
   [libjpeg]=libjpeg
   [libpng]=libpng
@@ -134,9 +128,6 @@ prepare() {
   # Upstream fixes
   patch -Np1 -i ../allow-ANGLEImplementation-kVulkan.patch
 
-  # https://issues.chromium.org/issues/351157339
-  patch -Np1 -i ../chromium-browser-ui-missing-deps.patch
-
   # Allow libclang_rt.builtins from compiler-rt >= 16 to be used
   patch -Np1 -i ../compiler-rt-adjust-paths.patch
 
@@ -144,7 +135,6 @@ prepare() {
   patch -Np1 -i ../increase-fortify-level.patch
 
   # Fixes for building with libstdc++ instead of libc++
-  patch -Np1 -i ../chromium-patches-*/chromium-117-material-color-include.patch
 
   # test deps are broken for ui/lens with system ICU
   # "//third_party/icu:icuuc_public" (taken from Gentoo ebuild)
@@ -172,7 +162,7 @@ prepare() {
     -f "$_ungoogled_repo/domain_substitution.list" -c domainsubcache.tar.gz ./
 
   # Link to system tools required by the build
-  rm -f third_party/node/linux/node-linux-x64/bin/node
+  mkdir -p third_party/node/linux/node-linux-x64/bin/
   ln -s /usr/bin/node third_party/node/linux/node-linux-x64/bin/
   ln -s /usr/bin/java third_party/jdk/current/bin/
 
