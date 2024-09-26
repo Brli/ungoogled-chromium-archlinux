@@ -9,13 +9,13 @@
 # Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
 
 pkgname=ungoogled-chromium
-pkgver=128.0.6613.137
-pkgrel=1
+pkgver=129.0.6668.70
+pkgrel=3
 _launcher_ver=8
 _system_clang=1
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
-_uc_ver=128.0.6613.137-1
+_uc_ver=129.0.6668.70-1
 pkgdesc="A lightweight approach to removing Google web service dependency"
 arch=('x86_64')
 url="https://github.com/ungoogled-software/ungoogled-chromium"
@@ -38,7 +38,6 @@ options=('!lto') # Chromium adds its own flags for ThinLTO
 source=(https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$pkgver.tar.xz
         $pkgname-$_uc_ver.tar.gz::https://github.com/$_uc_usr/ungoogled-chromium/archive/$_uc_ver.tar.gz
         https://github.com/foutrelis/chromium-launcher/archive/v$_launcher_ver/chromium-launcher-$_launcher_ver.tar.gz
-        https://gitlab.com/Matt.Jolly/chromium-patches/-/archive/${pkgver%%.*}/chromium-patches-${pkgver%%.*}.tar.bz2
         no-omnibox-suggestion-autocomplete.patch
         xdg-basedir.patch
         allow-ANGLEImplementation-kVulkan.patch
@@ -49,11 +48,12 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         0001-enable-linux-unstable-deb-target.patch
         0001-ozone-wayland-implement-text_input_manager_v3.patch
         0001-ozone-wayland-implement-text_input_manager-fixes.patch
-        0001-vaapi-flag-ozone-wayland.patch)
-sha256sums=('e1d39c170dfdc2627a7b003e11d77f04a578b8e1cfe41e714cdaa345c91f4943'
-            '94e2f80f72b1c0f791c826c734a676cd0cb60ebaaf2a8a4941a8475a15f5508d'
+        0001-vaapi-flag-ozone-wayland.patch
+        p010-Zero-Copy-for-VA-API-Decoding-for-Vulkan.patch
+        add-feature-to-allow-zero-copy-video-formats.patch)
+sha256sums=('094ddec3774b54feb04dcfb020e61766de16feabb04850d73ef82e38c4bbf2b5'
+            'a9eb8896329304e429552fb15c640debd87bc6c66b051f802d3da5d707c24744'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
-            '714b6649473457654b7bb08fdb9f60234558f7fe15a95ff9b0571863604d0dcc'
             'ff1591fa38e0ede7e883dc7494b813641b7a1a7cb1ded00d9baaee987c1dbea8'
             'eedfdfcdd22acc5797b73e1285e31b8ba3562fdd7fda6ac82171fb66a440c1e4'
             '1a5bc75a90abad153c8eb6dbdce138132a5f11190b0a40c925958a72d706b2aa'
@@ -64,7 +64,9 @@ sha256sums=('e1d39c170dfdc2627a7b003e11d77f04a578b8e1cfe41e714cdaa345c91f4943'
             '2a44756404e13c97d000cc0d859604d6848163998ea2f838b3b9bb2c840967e3'
             'd9974ddb50777be428fd0fa1e01ffe4b587065ba6adefea33678e1b3e25d1285'
             'a2da75d0c20529f2d635050e0662941c0820264ea9371eb900b9d90b5968fa6a'
-            '9a5594293616e1390462af1f50276ee29fd6075ffab0e3f944f6346cb2eb8aec')
+            '9a5594293616e1390462af1f50276ee29fd6075ffab0e3f944f6346cb2eb8aec'
+            '40db59162df2b7a2c0387bd620802f15424f637c09ba305b674fc09410ab21d1'
+            '713dab4f8c26790c0e4a4c5ce6a9269e90446df5370cc14214a01a363f7afe39')
 
 
 # Possible replacements are listed in build/linux/unbundle/replace_gn_files.py
@@ -82,7 +84,7 @@ declare -gA _system_libs=(
   #[libaom]=aom
   #[libavif]=libavif  # needs -DAVIF_ENABLE_EXPERIMENTAL_GAIN_MAP=ON
   [libdrm]=
-  [libjpeg]=libjpeg
+  [libjpeg]=libjpeg-turbo
   [libpng]=libpng
   #[libvpx]=libvpx
   [libwebp]=libwebp
@@ -127,7 +129,8 @@ prepare() {
   patch -Np1 -i ../use-oauth2-client-switches-as-default.patch
 
   # Upstream fixes
-  patch -Np1 -i ../allow-ANGLEImplementation-kVulkan.patch
+  patch -Np1 -i ../p010-Zero-Copy-for-VA-API-Decoding-for-Vulkan.patch
+  patch -Np1 -i ../add-feature-to-allow-zero-copy-video-formats.patch
 
   # Allow libclang_rt.builtins from compiler-rt >= 16 to be used
   patch -Np1 -i ../compiler-rt-adjust-paths.patch
