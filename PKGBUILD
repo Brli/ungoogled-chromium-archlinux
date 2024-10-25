@@ -9,13 +9,14 @@
 # Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
 
 pkgname=ungoogled-chromium
-pkgver=129.0.6668.100
+pkgver=130.0.6723.69
 pkgrel=1
 _launcher_ver=8
+_manual_clone=1
 _system_clang=1
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
-_uc_ver=129.0.6668.100-1
+_uc_ver=130.0.6723.69-1
 pkgdesc="A lightweight approach to removing Google web service dependency"
 arch=('x86_64')
 url="https://github.com/ungoogled-software/ungoogled-chromium"
@@ -48,11 +49,9 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         0001-enable-linux-unstable-deb-target.patch
         0001-ozone-wayland-implement-text_input_manager_v3.patch
         0001-ozone-wayland-implement-text_input_manager-fixes.patch
-        0001-vaapi-flag-ozone-wayland.patch
-        p010-Zero-Copy-for-VA-API-Decoding-for-Vulkan.patch
-        add-feature-to-allow-zero-copy-video-formats.patch)
-sha256sums=('281daed29a5cb546f6273130035d9980666d2232f356ad95fc06af3c90121bc2'
-            '0d5688bffb7050913a5e0749da1926e551468fd3362c2f9b33912d68a6dccfa9'
+        0001-vaapi-flag-ozone-wayland.patch)
+sha256sums=('720a1196410080056cd97a1f5ec34d68ba216a281d9b5157b7ea81ea018ec661'
+            'b7a3975ed17ec7cc4ab6143e3f3e1a056ab4b522d98643bc82cdfee726e919c1'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
             'ff1591fa38e0ede7e883dc7494b813641b7a1a7cb1ded00d9baaee987c1dbea8'
             'eedfdfcdd22acc5797b73e1285e31b8ba3562fdd7fda6ac82171fb66a440c1e4'
@@ -64,9 +63,12 @@ sha256sums=('281daed29a5cb546f6273130035d9980666d2232f356ad95fc06af3c90121bc2'
             '2a44756404e13c97d000cc0d859604d6848163998ea2f838b3b9bb2c840967e3'
             'd9974ddb50777be428fd0fa1e01ffe4b587065ba6adefea33678e1b3e25d1285'
             'a2da75d0c20529f2d635050e0662941c0820264ea9371eb900b9d90b5968fa6a'
-            '9a5594293616e1390462af1f50276ee29fd6075ffab0e3f944f6346cb2eb8aec'
-            '40db59162df2b7a2c0387bd620802f15424f637c09ba305b674fc09410ab21d1'
-            '713dab4f8c26790c0e4a4c5ce6a9269e90446df5370cc14214a01a363f7afe39')
+            '9a5594293616e1390462af1f50276ee29fd6075ffab0e3f944f6346cb2eb8aec')
+
+if (( _manual_clone )); then
+  source[0]=fetch-chromium-release
+  makedepends+=('python-httplib2' 'python-pyparsing' 'python-six' 'npm' 'rsync')
+fi
 
 
 # Possible replacements are listed in build/linux/unbundle/replace_gn_files.py
@@ -102,6 +104,9 @@ _unwanted_bundled_libs=(
 depends+=(${_system_libs[@]})
 
 prepare() {
+  if (( _manual_clone )); then
+    ./fetch-chromium-release $pkgver
+  fi
   cd "$srcdir/chromium-$pkgver"
 
   # Allow building against system libraries in official builds
@@ -129,8 +134,6 @@ prepare() {
   patch -Np1 -i ../use-oauth2-client-switches-as-default.patch
 
   # Upstream fixes
-  patch -Np1 -i ../p010-Zero-Copy-for-VA-API-Decoding-for-Vulkan.patch
-  patch -Np1 -i ../add-feature-to-allow-zero-copy-video-formats.patch
 
   # Allow libclang_rt.builtins from compiler-rt >= 16 to be used
   patch -Np1 -i ../compiler-rt-adjust-paths.patch
