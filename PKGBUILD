@@ -41,7 +41,6 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         https://github.com/foutrelis/chromium-launcher/archive/v$_launcher_ver/chromium-launcher-$_launcher_ver.tar.gz
         no-omnibox-suggestion-autocomplete.patch
         xdg-basedir.patch
-        allow-ANGLEImplementation-kVulkan.patch
         compiler-rt-adjust-paths.patch
         increase-fortify-level.patch
         use-oauth2-client-switches-as-default.patch
@@ -55,7 +54,6 @@ sha256sums=('720a1196410080056cd97a1f5ec34d68ba216a281d9b5157b7ea81ea018ec661'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
             'ff1591fa38e0ede7e883dc7494b813641b7a1a7cb1ded00d9baaee987c1dbea8'
             'eedfdfcdd22acc5797b73e1285e31b8ba3562fdd7fda6ac82171fb66a440c1e4'
-            '1a5bc75a90abad153c8eb6dbdce138132a5f11190b0a40c925958a72d706b2aa'
             'b3de01b7df227478687d7517f61a777450dca765756002c80c4915f271e2d961'
             'd634d2ce1fc63da7ac41f432b1e84c59b7cceabf19d510848a7cff40c8025342'
             'a9b417b96daec33c9059065e15b3a92ae1bf4b59f89d353659b335d9e0379db6'
