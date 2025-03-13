@@ -9,14 +9,14 @@
 # Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
 
 pkgname=ungoogled-chromium
-pkgver=134.0.6998.35
+pkgver=134.0.6998.88
 pkgrel=2
 _launcher_ver=8
 _manual_clone=0
 _system_clang=1
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
-_uc_ver=134.0.6998.35-1
+_uc_ver=134.0.6998.88-1
 pkgdesc="A lightweight approach to removing Google web service dependency"
 arch=('x86_64')
 url="https://github.com/ungoogled-software/ungoogled-chromium"
@@ -36,7 +36,7 @@ optdepends=('pipewire: WebRTC desktop sharing under Wayland'
 provides=("chromium=$pkgver" "chromedriver=$pkgver")
 conflicts=('chromium' 'chromedriver')
 options=('!lto') # Chromium adds its own flags for ThinLTO
-source=(https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$pkgver.tar.xz
+source=(https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$pkgver-lite.tar.xz
         $pkgname-$_uc_ver.tar.gz::https://github.com/$_uc_usr/ungoogled-chromium/archive/$_uc_ver.tar.gz
         https://github.com/foutrelis/chromium-launcher/archive/v$_launcher_ver/chromium-launcher-$_launcher_ver.tar.gz
         no-omnibox-suggestion-autocomplete.patch
@@ -48,9 +48,11 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         0001-enable-linux-unstable-deb-target.patch
         0001-ozone-wayland-implement-text_input_manager_v3.patch
         0001-ozone-wayland-implement-text_input_manager-fixes.patch
-        0001-vaapi-flag-ozone-wayland.patch)
-sha256sums=('d77f09bfa9bda8bbc4638ead83339d5ec52e39032c5a7047060dfdf94b767be7'
-            '272b8cf76e4124ea081655b1d11a56e5c8875d05dd2c83af2612db10e3ab6ce9'
+        0001-vaapi-flag-ozone-wayland.patch
+        skia-only-call-format_message-when-needed.patch
+        webrtc-fix-build-with-pipewire-1.4.patch)
+sha256sums=('aa079fa2a8ff15f1a8528d67f5c310cd7da41d6c9e607a38d57b0e5a11169d59'
+            'aff5907d01247071aa436c9619cb63c46b05a6b908b528f12fb8fcaf0c99ddbb'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
             'ff1591fa38e0ede7e883dc7494b813641b7a1a7cb1ded00d9baaee987c1dbea8'
             'eedfdfcdd22acc5797b73e1285e31b8ba3562fdd7fda6ac82171fb66a440c1e4'
@@ -61,7 +63,9 @@ sha256sums=('d77f09bfa9bda8bbc4638ead83339d5ec52e39032c5a7047060dfdf94b767be7'
             '2a44756404e13c97d000cc0d859604d6848163998ea2f838b3b9bb2c840967e3'
             'd9974ddb50777be428fd0fa1e01ffe4b587065ba6adefea33678e1b3e25d1285'
             'a2da75d0c20529f2d635050e0662941c0820264ea9371eb900b9d90b5968fa6a'
-            '9a5594293616e1390462af1f50276ee29fd6075ffab0e3f944f6346cb2eb8aec')
+            '9a5594293616e1390462af1f50276ee29fd6075ffab0e3f944f6346cb2eb8aec'
+            '271c7a767005b09e212808cfef7261dca00ea28ba7b808f69c3b5b9f202511d1'
+            '74a2d428f7f09132c4a923e816a5a9333803f842003d650cd4a95a35e5457253')
 
 if (( _manual_clone )); then
   source[0]=fetch-chromium-release
@@ -104,7 +108,7 @@ prepare() {
   if (( _manual_clone )); then
     ./fetch-chromium-release $pkgver
   fi
-  cd "$srcdir/chromium-$pkgver"
+  cd chromium-$pkgver
 
   # Allow building against system libraries in official builds
   sed -i 's/OFFICIAL_BUILD/GOOGLE_CHROME_BUILD/' \
@@ -131,6 +135,8 @@ prepare() {
   patch -Np1 -i ../use-oauth2-client-switches-as-default.patch
 
   # Upstream fixes
+  patch -Np1 -d third_party/webrtc <../webrtc-fix-build-with-pipewire-1.4.patch
+  patch -Np1 -d third_party/skia <../skia-only-call-format_message-when-needed.patch
 
   # Allow libclang_rt.builtins from compiler-rt >= 16 to be used
   patch -Np1 -i ../compiler-rt-adjust-paths.patch
@@ -193,7 +199,7 @@ prepare() {
 build() {
   make -C chromium-launcher-$_launcher_ver
 
-  cd "$srcdir/chromium-$pkgver"
+  cd chromium-$pkgver
 
   if (( _system_clang )); then
     export CC=clang
@@ -300,10 +306,10 @@ package() {
   install -Dm644 LICENSE \
     "$pkgdir/usr/share/licenses/chromium/LICENSE.launcher"
 
-  cd "$srcdir/chromium-$pkgver"
+  cd ../chromium-$pkgver
 
   install -D out/Release/chrome "$pkgdir/usr/lib/chromium/chromium"
-  install -D out/Release/chromedriver "$pkgdir/usr/bin/chromedriver"
+  install -D out/Release/chromedriver.unstripped "$pkgdir/usr/bin/chromedriver"
   install -Dm4755 out/Release/chrome_sandbox "$pkgdir/usr/lib/chromium/chrome-sandbox"
 
   install -Dm644 chrome/installer/linux/common/desktop.template \
