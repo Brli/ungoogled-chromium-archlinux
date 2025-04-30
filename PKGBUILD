@@ -9,14 +9,14 @@
 # Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
 
 pkgname=ungoogled-chromium
-pkgver=135.0.7049.84
+pkgver=135.0.7049.114
 pkgrel=1
 _launcher_ver=8
 _manual_clone=0
 _system_clang=1
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
-_uc_ver=135.0.7049.84-1
+_uc_ver=135.0.7049.114-1
 pkgdesc="A lightweight approach to removing Google web service dependency"
 arch=('x86_64')
 url="https://github.com/ungoogled-software/ungoogled-chromium"
@@ -52,8 +52,8 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         skia-only-call-format_message-when-needed.patch
         webrtc-fix-build-with-pipewire-1.4.patch
         add-more-CFI-suppressions-for-inline-PipeWire-functions.patch)
-sha256sums=('c1e8d9cd9913d3e91d08b212d8346b2da48e884e5b180d5cd783f0c0756a20f7'
-            '13d7c11a678ae1a729996d2f2906c079cca8e015ba28f2f62ff6ba26c89e165a'
+sha256sums=('33c538ae7443d0cc11b9841276d20abe8c260198fa50e905e88aa9b8c2052e83'
+            'bac5b844e936ec0340cdaa7e9a8d5b4cc3875d30828a1d6fa816f980d0f96e2e'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
             'ff1591fa38e0ede7e883dc7494b813641b7a1a7cb1ded00d9baaee987c1dbea8'
             'eedfdfcdd22acc5797b73e1285e31b8ba3562fdd7fda6ac82171fb66a440c1e4'
@@ -156,10 +156,6 @@ prepare() {
 
     # To link to rust libraries we need to compile with prebuilt clang
     ./tools/clang/scripts/update.py
-  elif ! find /usr/lib/rustlib | grep -q adler2; then
-    # Rust 1.86 ships adler2 but we need to change it to adler when
-    # using older Rust versions (idea for this borrowed from Gentoo)
-    sed -i 's/adler2/adler/' build/rust/std/BUILD.gn
   fi
 
   # Ungoogled Chromium changes
