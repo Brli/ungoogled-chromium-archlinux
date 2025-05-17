@@ -9,14 +9,14 @@
 # Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
 
 pkgname=ungoogled-chromium
-pkgver=135.0.7049.114
+pkgver=136.0.7103.113
 pkgrel=1
 _launcher_ver=8
-_manual_clone=0
+_manual_clone=1
 _system_clang=1
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
-_uc_ver=135.0.7049.114-1
+_uc_ver=136.0.7103.113-1
 pkgdesc="A lightweight approach to removing Google web service dependency"
 arch=('x86_64')
 url="https://github.com/ungoogled-software/ungoogled-chromium"
@@ -49,11 +49,11 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         0001-ozone-wayland-implement-text_input_manager_v3.patch
         0001-ozone-wayland-implement-text_input_manager-fixes.patch
         0001-vaapi-flag-ozone-wayland.patch
-        skia-only-call-format_message-when-needed.patch
-        webrtc-fix-build-with-pipewire-1.4.patch
-        add-more-CFI-suppressions-for-inline-PipeWire-functions.patch)
-sha256sums=('33c538ae7443d0cc11b9841276d20abe8c260198fa50e905e88aa9b8c2052e83'
-            'bac5b844e936ec0340cdaa7e9a8d5b4cc3875d30828a1d6fa816f980d0f96e2e'
+        add-more-CFI-suppressions-for-inline-PipeWire-functions.patch
+        chromium-136-drop-nodejs-ver-check.patch
+        disable-clang-warning-suppression-flag.patch)
+sha256sums=('720a1196410080056cd97a1f5ec34d68ba216a281d9b5157b7ea81ea018ec661'
+            'ab4c1b21292b860eaa750d3fb9ee73dae58a86d2dd59d4e41e06102e8c9f635a'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
             'ff1591fa38e0ede7e883dc7494b813641b7a1a7cb1ded00d9baaee987c1dbea8'
             'eedfdfcdd22acc5797b73e1285e31b8ba3562fdd7fda6ac82171fb66a440c1e4'
@@ -65,9 +65,9 @@ sha256sums=('33c538ae7443d0cc11b9841276d20abe8c260198fa50e905e88aa9b8c2052e83'
             'd9974ddb50777be428fd0fa1e01ffe4b587065ba6adefea33678e1b3e25d1285'
             'a2da75d0c20529f2d635050e0662941c0820264ea9371eb900b9d90b5968fa6a'
             '9a5594293616e1390462af1f50276ee29fd6075ffab0e3f944f6346cb2eb8aec'
-            '271c7a767005b09e212808cfef7261dca00ea28ba7b808f69c3b5b9f202511d1'
-            '74a2d428f7f09132c4a923e816a5a9333803f842003d650cd4a95a35e5457253'
-            'd3dd9b4132c9748b824f3dcf730ec998c0087438db902bc358b3c391658bebf5')
+            'd3dd9b4132c9748b824f3dcf730ec998c0087438db902bc358b3c391658bebf5'
+            '32f0080282fc0b2795a342bf17fcb3db4028c5d02619c7e304222230ba99d5fe'
+            'd6f3914c6adadaf061e7e2b1430c96d32b0cad05244b5cfaf58cf5344006a169')
 
 if (( _manual_clone )); then
   source[0]=fetch-chromium-release
@@ -137,15 +137,19 @@ prepare() {
   patch -Np1 -i ../use-oauth2-client-switches-as-default.patch
 
   # Upstream fixes
-  patch -Np1 -d third_party/webrtc <../webrtc-fix-build-with-pipewire-1.4.patch
-  patch -Np1 -d third_party/skia <../skia-only-call-format_message-when-needed.patch
   patch -Np1 -i ../add-more-CFI-suppressions-for-inline-PipeWire-functions.patch
+
+  # Fixes from Gentoo
+  patch -Np1 -i ../chromium-136-drop-nodejs-ver-check.patch
 
   # Allow libclang_rt.builtins from compiler-rt >= 16 to be used
   patch -Np1 -i ../compiler-rt-adjust-paths.patch
 
   # Increase _FORTIFY_SOURCE level to match Arch's default flags
   patch -Np1 -i ../increase-fortify-level.patch
+
+  # Disable usage of --warning-suppression-mappings flag which needs clang 20
+  patch -Np1 -i ../disable-clang-warning-suppression-flag.patch
 
   # Fixes for building with libstdc++ instead of libc++
 
