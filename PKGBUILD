@@ -10,14 +10,14 @@
 # Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
 
 pkgname=ungoogled-chromium
-pkgver=140.0.7339.127
+pkgver=140.0.7339.207
 pkgrel=1
 _launcher_ver=8
-_manual_clone=0
+_manual_clone=1
 _system_clang=1
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
-_uc_ver=140.0.7339.127-1
+_uc_ver=140.0.7339.207-1
 pkgdesc="A lightweight approach to removing Google web service dependency"
 arch=('x86_64')
 url="https://github.com/ungoogled-software/ungoogled-chromium"
@@ -26,7 +26,7 @@ depends=('gtk3' 'nss' 'alsa-lib' 'xdg-utils' 'libxss' 'libcups' 'libgcrypt'
          'ttf-liberation' 'systemd' 'dbus' 'libpulse' 'pciutils' 'libva'
          'libffi' 'desktop-file-utils' 'hicolor-icon-theme')
 makedepends=('python' 'gn' 'ninja' 'clang' 'lld' 'gperf' 'nodejs' 'pipewire'
-             'rust' 'rust-bindgen' 'qt6-base' 'java-runtime-headless'
+             'rustup' 'rust-bindgen' 'qt6-base' 'java-runtime-headless'
              'git')
 optdepends=('pipewire: WebRTC desktop sharing under Wayland'
             'kdialog: support for native dialogs in Plasma'
@@ -53,8 +53,8 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         chromium-138-nodejs-version-check.patch
         chromium-138-rust-1.86-mismatched_lifetime_syntaxes.patch
         chromium-140.0.7339.41-rust.patch)
-sha256sums=('02a0d17f811bb780e5b81bb457200bf1c95a49a78ce7e023d0367c30c38fda7c'
-            '471a5ff29e01a8e7092e8ea88391a3d6cce196054db66d44ca70a068e3de3e9b'
+sha256sums=('720a1196410080056cd97a1f5ec34d68ba216a281d9b5157b7ea81ea018ec661'
+            '6592c09f06a2adcbfc8dba3e216dc3a08ca2f8c940fc2725af90c5d042404be9'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
             'ff1591fa38e0ede7e883dc7494b813641b7a1a7cb1ded00d9baaee987c1dbea8'
             '2848ccca54ec4a118471b833d20cf3a32fff7775d5b0fc881f9e1660dcd6ca23'
@@ -201,6 +201,8 @@ prepare() {
 }
 
 build() {
+  rustup toolchain install 1.89.0
+
   make -C chromium-launcher-$_launcher_ver
 
   cd chromium-$pkgver
