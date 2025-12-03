@@ -10,14 +10,14 @@
 # Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
 
 pkgname=ungoogled-chromium
-pkgver=142.0.7444.59
-pkgrel=4
+pkgver=142.0.7444.175
+pkgrel=1
 _launcher_ver=8
 _manual_clone=0
 _system_clang=1
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
-_uc_ver=142.0.7444.59-2
+_uc_ver=142.0.7444.175-1
 pkgdesc="A lightweight approach to removing Google web service dependency"
 arch=('x86_64')
 url="https://github.com/ungoogled-software/ungoogled-chromium"
@@ -54,7 +54,7 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         chromium-138-rust-1.86-mismatched_lifetime_syntaxes.patch
         chromium-141-cssstylesheet-iwyu.patch)
 sha256sums=('720a1196410080056cd97a1f5ec34d68ba216a281d9b5157b7ea81ea018ec661'
-            '45892f816ab6c53e4e7f2f9d0afcb1e1c9ff4c324653d05a8d388fb83fc71458'
+            'ec3584995b6a69373fc06f6230602c1ebc68f802feedba44c962dc25bb896e33'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
             'ff1591fa38e0ede7e883dc7494b813641b7a1a7cb1ded00d9baaee987c1dbea8'
             '2848ccca54ec4a118471b833d20cf3a32fff7775d5b0fc881f9e1660dcd6ca23'
