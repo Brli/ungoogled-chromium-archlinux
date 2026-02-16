@@ -10,14 +10,14 @@
 # Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
 
 pkgname=ungoogled-chromium
-pkgver=144.0.7559.109
-pkgrel=1
+pkgver=145.0.7632.75
+pkgrel=2
 _launcher_ver=8
 _manual_clone=0
 _system_clang=1
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
-_uc_ver=144.0.7559.109-1
+_uc_ver=145.0.7632.75-1
 pkgdesc="A lightweight approach to removing Google web service dependency"
 arch=('x86_64')
 url="https://github.com/ungoogled-software/ungoogled-chromium"
@@ -42,32 +42,25 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         https://github.com/foutrelis/chromium-launcher/archive/v$_launcher_ver/chromium-launcher-$_launcher_ver.tar.gz
         no-omnibox-suggestion-autocomplete.patch
         xdg-basedir.patch
+        chromium-138-nodejs-version-check.patch
+        chromium-145-fix-SYS_SECCOMP.patch
         compiler-rt-adjust-paths.patch
         increase-fortify-level.patch
-        use-oauth2-client-switches-as-default.patch
-        0001-adjust-buffer-format-order.patch
-        0001-enable-linux-unstable-deb-target.patch
-        0001-ozone-wayland-implement-text_input_manager_v3.patch
-        0001-ozone-wayland-implement-text_input_manager-fixes.patch
-        0001-vaapi-flag-ozone-wayland.patch
-        chromium-138-nodejs-version-check.patch)
-sha256sums=('06c6bf558a17636070495d2d33117501c361c6984d71356188cdfae7d9ee8bc1'
-            'fd41306be5ee9411cae735a9a49a79dedeaacc5a8b9fb93f7b914192addf143e'
+        use-oauth2-client-switches-as-default.patch)
+sha256sums=('e9db10f2065fda0ee715c1f41fa110cccc4c800a2d7d9a5f8f355b2e210f377f'
+            'ba956eb1779fcb76dd00f5bc63c0e2e9399270d7942e1f003765dbbbc61cb18d'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
             'ff1591fa38e0ede7e883dc7494b813641b7a1a7cb1ded00d9baaee987c1dbea8'
             '2848ccca54ec4a118471b833d20cf3a32fff7775d5b0fc881f9e1660dcd6ca23'
+            '11a96ffa21448ec4c63dd5c8d6795a1998d8e5cd5a689d91aea4d2bdd13fb06e'
+            '4fc040a0656a0a524dd8ad090cd129fc5b6cb21adcc66be82080165789e8c13e'
             'ec8e49b7114e2fa2d359155c9ef722ff1ba5fe2c518fa48e30863d71d3b82863'
             'd634d2ce1fc63da7ac41f432b1e84c59b7cceabf19d510848a7cff40c8025342'
-            'e6da901e4d0860058dc2f90c6bbcdc38a0cf4b0a69122000f62204f24fa7e374'
-            '8ba5c67b7eb6cacd2dbbc29e6766169f0fca3bbb07779b1a0a76c913f17d343f'
-            '2a44756404e13c97d000cc0d859604d6848163998ea2f838b3b9bb2c840967e3'
-            'd9974ddb50777be428fd0fa1e01ffe4b587065ba6adefea33678e1b3e25d1285'
-            'a2da75d0c20529f2d635050e0662941c0820264ea9371eb900b9d90b5968fa6a'
-            '9a5594293616e1390462af1f50276ee29fd6075ffab0e3f944f6346cb2eb8aec'
-            '11a96ffa21448ec4c63dd5c8d6795a1998d8e5cd5a689d91aea4d2bdd13fb06e')
+            '9343afa1a4308a7cfb3317229f5aff7778688debcc03c4a74a85908aa1d0cc3a')
 
 if (( _manual_clone )); then
   source[0]=fetch-chromium-release
+  sha256sums[0]='2e2f36e3cd1ebc4ad57fd310774a5e5e9db77883d5f9374fedeaabd3c103b819'
   makedepends+=('python-httplib2' 'python-pyparsing' 'python-six' 'npm' 'rsync')
 fi
 
@@ -143,6 +136,9 @@ prepare() {
 
   # Increase _FORTIFY_SOURCE level to match Arch's default flags
   patch -Np1 -i ../increase-fortify-level.patch
+
+  # https://crbug.com/456218403
+  patch -Np1 -i ../chromium-145-fix-SYS_SECCOMP.patch
 
   if (( !_system_clang )); then
     # Use prebuilt rust as system rust cannot be used due to the error:
@@ -319,11 +315,11 @@ package() {
   install -Dvm644 chrome/app/resources/manpage.1.in \
     "$pkgdir/usr/share/man/man1/chromium.1"
   sed -i \
-    -e 's/@@MENUNAME@@/Chromium/g' \
-    -e 's/@@PACKAGE@@/chromium/g' \
-    -e 's/@@USR_BIN_SYMLINK_NAME@@/chromium/g' \
-    -e 's|@@URI_SCHEME@@|x-scheme-handler/chromium;|g' \
-    -e 's/@@EXTRA_DESKTOP_ENTRIES@@//g' \
+    -e 's/@@MENUNAME/Chromium/g' \
+    -e 's/@@PACKAGE/chromium/g' \
+    -e 's/@@usr_bin_symlink_name/chromium/g' \
+    -e 's|@@uri_scheme|x-scheme-handler/chromium;|g' \
+    -e 's/@@extra_desktop_entries//g' \
     "$pkgdir/usr/share/applications/chromium.desktop" \
     "$pkgdir/usr/share/man/man1/chromium.1"
 
