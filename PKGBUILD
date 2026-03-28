@@ -10,29 +10,56 @@
 # Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
 
 pkgname=ungoogled-chromium
-pkgver=145.0.7632.75
-pkgrel=2
+pkgver=146.0.7680.164
+pkgrel=1
 _launcher_ver=8
-_manual_clone=0
+_manual_clone=1
 _system_clang=1
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
-_uc_ver=145.0.7632.75-1
+_uc_ver=146.0.7680.164-1
 pkgdesc="A lightweight approach to removing Google web service dependency"
 arch=('x86_64')
 url="https://github.com/ungoogled-software/ungoogled-chromium"
 license=('BSD-3-Clause')
-depends=('gtk3' 'nss' 'alsa-lib' 'xdg-utils' 'libxss' 'libcups' 'libgcrypt'
-         'ttf-liberation' 'systemd' 'dbus' 'libpulse' 'pciutils' 'libva'
-         'libffi' 'desktop-file-utils' 'hicolor-icon-theme')
-makedepends=('python' 'gn' 'ninja' 'clang' 'lld' 'gperf' 'nodejs' 'pipewire'
-             'rust' 'rust-bindgen' 'qt6-base' 'java-runtime-headless'
-             'git' 'compiler-rt')
+depends=(
+  'alsa-lib'
+  'dbus'
+  'desktop-file-utils'
+  'gtk3'
+  'hicolor-icon-theme'
+  'libcups'
+  'libffi'
+  'libgcrypt'
+  'libpulse'
+  'libva'
+  'libxss'
+  'nss'
+  'pciutils'
+  'systemd'
+  'ttf-liberation'
+  'xdg-utils'
+)
+makedepends=(
+  'clang'
+  'compiler-rt'
+  'git'
+  'gn'
+  'gperf'
+  'java-runtime-headless'
+  'lld'
+  'ninja'
+  'nodejs'
+  'pipewire'
+  'python'
+  'qt6-base'
+  'rust-bindgen'
+  'rust'
+)
 optdepends=('pipewire: WebRTC desktop sharing under Wayland'
             'kdialog: support for native dialogs in Plasma'
             'gtk4: for --gtk-version=4 (GTK4 IME might work better on Wayland)'
             'org.freedesktop.secrets: password storage backend on GNOME / Xfce'
-            'kwallet: support for storing passwords in KWallet on Plasma'
             'upower: Battery Status API support')
 provides=("chromium=$pkgver" "chromedriver=$pkgver")
 conflicts=('chromium' 'chromedriver')
@@ -44,19 +71,27 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         xdg-basedir.patch
         chromium-138-nodejs-version-check.patch
         chromium-145-fix-SYS_SECCOMP.patch
+        chromium-146-drop-unknown-clang-flag.patch
+        chromium-146-apply-upstream-libmuck-fix.patch
         compiler-rt-adjust-paths.patch
         increase-fortify-level.patch
-        use-oauth2-client-switches-as-default.patch)
-sha256sums=('e9db10f2065fda0ee715c1f41fa110cccc4c800a2d7d9a5f8f355b2e210f377f'
-            'ba956eb1779fcb76dd00f5bc63c0e2e9399270d7942e1f003765dbbbc61cb18d'
+        enable-widevine-arm64.patch
+        use-oauth2-client-switches-as-default.patch
+        glibc-2.42-baud-rate-fix.patch)
+sha256sums=('2e2f36e3cd1ebc4ad57fd310774a5e5e9db77883d5f9374fedeaabd3c103b819'
+            'd5f2a7e20af064fa70dc87095021cf035842527fdc09f73a743dba028562d538'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
             'ff1591fa38e0ede7e883dc7494b813641b7a1a7cb1ded00d9baaee987c1dbea8'
             '2848ccca54ec4a118471b833d20cf3a32fff7775d5b0fc881f9e1660dcd6ca23'
             '11a96ffa21448ec4c63dd5c8d6795a1998d8e5cd5a689d91aea4d2bdd13fb06e'
             '4fc040a0656a0a524dd8ad090cd129fc5b6cb21adcc66be82080165789e8c13e'
+            '24535c314c7e70c52bcf409aaf604728bfc5b5c97e60087e630e1f7233b9e12d'
+            '06299959918481caf2c27bcb1841088967d9855acc22970ffcaa75e0cb218f0e'
             'ec8e49b7114e2fa2d359155c9ef722ff1ba5fe2c518fa48e30863d71d3b82863'
             'd634d2ce1fc63da7ac41f432b1e84c59b7cceabf19d510848a7cff40c8025342'
-            '9343afa1a4308a7cfb3317229f5aff7778688debcc03c4a74a85908aa1d0cc3a')
+            '9c766b82d1143cb3413fe2057361bd2655e46287eacc2c6d6f8504b4c255647a'
+            '9343afa1a4308a7cfb3317229f5aff7778688debcc03c4a74a85908aa1d0cc3a'
+            '1c1898f263eaacbc069a8e1a3e732852350350d1dad4cb1a6bba430e3b796cd0')
 
 if (( _manual_clone )); then
   source[0]=fetch-chromium-release
@@ -97,6 +132,8 @@ _unwanted_bundled_libs=(
 depends+=(${_system_libs[@]})
 
 prepare() {
+  # rustup install nightly
+
   if (( _manual_clone )); then
     ./fetch-chromium-release $pkgver
   fi
@@ -137,8 +174,21 @@ prepare() {
   # Increase _FORTIFY_SOURCE level to match Arch's default flags
   patch -Np1 -i ../increase-fortify-level.patch
 
+  # Fix issue about missing compiler flag, can be dropped when arch has LLVM 23
+  # clang++: error: unknown argument: '-fsanitize-ignore-for-ubsan-feature=array-bounds'
+  patch -Np1 -i ../chromium-146-drop-unknown-clang-flag.patch
+
+  # https://chromium-review.googlesource.com/c/chromium/src/+/7487414
+  patch -Np1 -i ../chromium-146-apply-upstream-libmuck-fix.patch
+
   # https://crbug.com/456218403
   patch -Np1 -i ../chromium-145-fix-SYS_SECCOMP.patch
+
+  # enable widevine for arm64
+  patch -Np1 -i ../enable-widevine-arm64.patch
+
+  # https://crbug.com/456677057
+  patch -Np1 -i ../glibc-2.42-baud-rate-fix.patch
 
   if (( !_system_clang )); then
     # Use prebuilt rust as system rust cannot be used due to the error:
@@ -147,11 +197,6 @@ prepare() {
 
     # To link to rust libraries we need to compile with prebuilt clang
     ./tools/clang/scripts/update.py
-  else
-    # To use correct libadler2 lib
-    # See also: https://github.com/ungoogled-software/ungoogled-chromium/pull/3598
-    sed -i 's/rustc_nightly_capability = use_chromium_rust_toolchain/rustc_nightly_capability = true/' \
-      build/config/rust.gni
   fi
 
   # Ungoogled Chromium changes
@@ -189,6 +234,11 @@ prepare() {
 
   ./build/linux/unbundle/replace_gn_files.py \
     --system-libraries "${!_system_libs[@]}"
+
+  # Generate missing header
+  python3 build/util/lastchange.py -m DAWN_COMMIT_HASH \
+    -s third_party/dawn --revision gpu/webgpu/DAWN_VERSION \
+    --header gpu/webgpu/dawn_commit_hash.h
 }
 
 build() {
@@ -261,7 +311,7 @@ build() {
     _flags+=(
       'rust_sysroot_absolute="/usr"'
       'rust_bindgen_root="/usr"'
-      "rustc_version=\"$(rustc --version)\""
+      "rustc_version=\"$(rustc --version | awk '{ print $2 ;}')\""
     )
   fi
 
