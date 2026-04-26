@@ -13,7 +13,7 @@ pkgname=ungoogled-chromium
 pkgver=147.0.7727.116
 pkgrel=1
 _launcher_ver=8
-_manual_clone=1
+_manual_clone=0
 _system_clang=1
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
@@ -68,7 +68,6 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         $pkgname-$_uc_ver.tar.gz::https://github.com/$_uc_usr/ungoogled-chromium/archive/$_uc_ver.tar.gz
         https://github.com/foutrelis/chromium-launcher/archive/v$_launcher_ver/chromium-launcher-$_launcher_ver.tar.gz
         no-omnibox-suggestion-autocomplete.patch
-        xdg-basedir.patch
         chromium-138-nodejs-version-check.patch
         chromium-145-fix-SYS_SECCOMP.patch
         chromium-146-drop-unknown-clang-flag.patch
@@ -79,11 +78,10 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         enable-widevine-arm64.patch
         use-oauth2-client-switches-as-default.patch
         glibc-2.42-baud-rate-fix.patch)
-sha256sums=('2e2f36e3cd1ebc4ad57fd310774a5e5e9db77883d5f9374fedeaabd3c103b819'
+sha256sums=('44be73f82b1b670255b3c58676be08844ddf1bf5727d5fcdf430d214aa8d15bb'
             '8f3f7340d457d58348bc90b5cda222fd3e9b7021c4156b76f3071fb8b15c0436'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
-            'ff1591fa38e0ede7e883dc7494b813641b7a1a7cb1ded00d9baaee987c1dbea8'
-            '2848ccca54ec4a118471b833d20cf3a32fff7775d5b0fc881f9e1660dcd6ca23'
+            'f4a93437b3e45518fc307606a98e5b4b1fb3471f44ce36a8ef83d57e5c90ca72'
             '11a96ffa21448ec4c63dd5c8d6795a1998d8e5cd5a689d91aea4d2bdd13fb06e'
             '4fc040a0656a0a524dd8ad090cd129fc5b6cb21adcc66be82080165789e8c13e'
             '24535c314c7e70c52bcf409aaf604728bfc5b5c97e60087e630e1f7233b9e12d'
@@ -151,9 +149,6 @@ prepare() {
     third_party/blink/renderer/core/xml/*.cc \
     third_party/blink/renderer/core/xml/parser/xml_document_parser.cc \
     third_party/libxml/chromium/*.cc
-
-  # move ~/.pki directory to ${XDG_DATA_HOME:-$HOME/.local}/share/pki
-  patch -p1 -i ../xdg-basedir.patch
 
   # You can now set '1' in the flag #omnibox-ui-max-autocomplete-matches to
   # effectively disable autocompletion in the url bar (and therefore the so-
@@ -345,6 +340,9 @@ build() {
 
   # https://crbug.com/957519#c122
   CXXFLAGS=${CXXFLAGS/-Wp,-D_GLIBCXX_ASSERTIONS}
+
+  # Enlarge Rust minimal stack size
+  export RUST_MIN_STACK=134217728
 
   msg2 'Configuring Chromium'
   gn gen out/Release --args="${_flags[*]}"
