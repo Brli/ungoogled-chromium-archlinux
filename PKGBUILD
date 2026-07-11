@@ -11,14 +11,14 @@
 # Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
 
 pkgname=ungoogled-chromium
-pkgver=149.0.7827.200
+pkgver=150.0.7871.114
 pkgrel=1
 _launcher_ver=8
 _manual_clone=0
 _system_clang=1
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
-_uc_ver=149.0.7827.200-1
+_uc_ver=150.0.7871.114-1
 pkgdesc="A lightweight approach to removing Google web service dependency"
 arch=('x86_64')
 url="https://github.com/ungoogled-software/ungoogled-chromium"
@@ -97,13 +97,16 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         chromium-149-drop-unknown-clang-flag.patch
         chromium-149-unbundle-minizip-undo-unicode.patch
         chromium-149-use-of-undeclared-identifier-ERROR.patch
+        chromium-150-fix-ar-unbundle.patch
+        chromium-150-fix-sysroot-path-error.patch
+        chromium-150-revert-avx-flag-change.patch
         compiler-rt-adjust-paths.patch
         increase-fortify-level.patch
         enable-widevine-arm64.patch
         use-oauth2-client-switches-as-default.patch
         glibc-2.42-baud-rate-fix.patch)
-sha256sums=('2e2f36e3cd1ebc4ad57fd310774a5e5e9db77883d5f9374fedeaabd3c103b819'
-            '32c76a2f6d6d8cc4055cc909a45501d4932dd4ab5b5a4e4f2ca24cc43874c90e'
+sha256sums=('e2654fa7c37ddc20af98f91089ad580e347ca9c526f8de8e625fe1b1cf3d98c6'
+            '626e7854f4cded52740ee337c5dd6840880bbbe61c0e40d722c385dc372f2f31'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
             'f4a93437b3e45518fc307606a98e5b4b1fb3471f44ce36a8ef83d57e5c90ca72'
             '11a96ffa21448ec4c63dd5c8d6795a1998d8e5cd5a689d91aea4d2bdd13fb06e'
@@ -113,6 +116,9 @@ sha256sums=('2e2f36e3cd1ebc4ad57fd310774a5e5e9db77883d5f9374fedeaabd3c103b819'
             '5ade4cdba7afebfcc09fa969f15bf27404579beac5b7bafb59a0214d407e4ad2'
             'c22338d13f12772cdbcb5cfc1ace94438b9f9c72353cdb165a3ff3ef3d677c78'
             '951514535be65f0e2f84e82305d96292be1da353c1427ba1048ea24be70003c4'
+            'f056d12571823d06c2a938158734fb4c7eeccb5c6f68228634d0c73d75feaa78'
+            '5c42260b11b87dd01c4ef11598033e9687bdf384af2e45adab2fd00964e977e8'
+            '5f6ccb7b945c8a13c690493723bad816b36f2f25792d47e677b56f8200907e60'
             'ec8e49b7114e2fa2d359155c9ef722ff1ba5fe2c518fa48e30863d71d3b82863'
             'd634d2ce1fc63da7ac41f432b1e84c59b7cceabf19d510848a7cff40c8025342'
             '33d1650e183a86cc2d0e9b0fcc08a5da76c7354d25a419921e9d2dc02b8b3854'
@@ -227,6 +233,18 @@ prepare() {
 
   patch -Np1 -i ../chromium-149-use-of-undeclared-identifier-ERROR.patch
 
+  # Fix issue about missing AR file
+  # Credit: https://github.com/ungoogled-software/ungoogled-chromium/pull/3837
+  patch -Np1 -i ../chromium-150-fix-ar-unbundle.patch
+
+  # Fix issue about missing sysroot path
+  # Credit: https://github.com/ungoogled-software/ungoogled-chromium/pull/3837#issuecomment-4836756738
+  patch -Np1 -i ../chromium-150-fix-sysroot-path-error.patch
+
+  # Fix issue about missing AVX functions
+  # Credit: https://github.com/ungoogled-software/ungoogled-chromium/pull/3837
+  patch -Np1 -i ../chromium-150-revert-avx-flag-change.patch
+
   if (( !_system_clang )); then
     # Use prebuilt rust as system rust cannot be used due to the error:
     #   error: the option `Z` is only accepted on the nightly compiler
@@ -279,9 +297,11 @@ prepare() {
     --system-libraries "${!_system_libs[@]}"
 
   # Generate missing header
-  python3 build/util/lastchange.py -m DAWN_COMMIT_HASH \
-    -s third_party/dawn --revision gpu/webgpu/DAWN_VERSION \
-    --header gpu/webgpu/dawn_commit_hash.h
+  if (( _manual_clone )); then
+    python3 build/util/lastchange.py -m DAWN_COMMIT_HASH \
+      -s third_party/dawn --revision gpu/webgpu/DAWN_VERSION \
+      --header gpu/webgpu/dawn_commit_hash.h
+  fi
 }
 
 build() {
