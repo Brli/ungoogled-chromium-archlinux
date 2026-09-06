@@ -111,7 +111,7 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
 sha256sums=('a672d1a84b0a7744e2bb6c9d038a2aace269db51bcf99e76895fb169a7e0c218'
             '0754581d607ab3806cb5dbb319f28d0bb0cddfe6c64015b59dff7d40c859cddb'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
-            'f4a93437b3e45518fc307606a98e5b4b1fb3471f44ce36a8ef83d57e5c90ca72'
+            '7b78866f47acd4af2262e7a4da235eb339743d114d9877eddf50ef930fca01cb'
             '11a96ffa21448ec4c63dd5c8d6795a1998d8e5cd5a689d91aea4d2bdd13fb06e'
             '4fc040a0656a0a524dd8ad090cd129fc5b6cb21adcc66be82080165789e8c13e'
             'c382830318c5b37826ecf44f3ba9def6be8affdad1bce819ecb83f3222ff4b3a'
