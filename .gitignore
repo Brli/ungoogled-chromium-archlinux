@@ -4,5 +4,6 @@
 pkg
 src
 *.tar.*
+crubit
 ungoogled-chromium-archlinux
 git_operation.sh
