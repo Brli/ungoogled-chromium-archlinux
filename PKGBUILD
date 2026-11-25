@@ -13,7 +13,7 @@
 # Contributor: Caleb Maclennan <caleb@alerque.com>
 
 pkgname=ungoogled-chromium
-pkgver=158.0.8127.36
+pkgver=158.0.8127.88
 pkgrel=1
 _launcher_ver=8
 _manual_clone=0
@@ -22,7 +22,7 @@ _system_clang=1
 _crubit_rev=d757594f6f7ac27c0cf9c8ea63d9136f8e1f77ae
 # ungoogled chromium variables
 _uc_usr=ungoogled-software
-_uc_ver=158.0.8127.36-1
+_uc_ver=158.0.8127.88-1
 pkgdesc="A lightweight approach to removing Google web service dependency"
 arch=('x86_64')
 url="https://github.com/ungoogled-software/ungoogled-chromium"
@@ -32,7 +32,6 @@ depends=(
   'at-spi2-core'
   'cairo'
   'dbus'
-  'desktop-file-utils'
   'expat'
   'glib2'
   'glibc'
@@ -119,9 +118,9 @@ source=(https://commondatastorage.googleapis.com/chromium-browser-official/chrom
         enable-widevine-arm64.patch
         use-oauth2-client-switches-as-default.patch
         glibc-2.42-baud-rate-fix.patch)
-sha256sums=('8a93030a68231ea046479c47d6b26dfae43becef1b5343cf95f8146109291d6d'
+sha256sums=('76f5aa94996e31a59b9aa01944c5bdc181043ff58553aff572f9d5750acd326d'
             'fa10e66c8078c2e02cf7e1df0810b7c7d77b89592cc27fca7a756cc4a5ba06cb'
-            '7c6436fad80824245828b649ca776cb1c44f6827267858a7b1bb482ab62819c9'
+            'c02190304095cd790c729d6069ecf9a43b48123efe5d93ae46489ef71459da57'
             '213e50f48b67feb4441078d50b0fd431df34323be15be97c55302d3fdac4483a'
             '7b78866f47acd4af2262e7a4da235eb339743d114d9877eddf50ef930fca01cb'
             '11a96ffa21448ec4c63dd5c8d6795a1998d8e5cd5a689d91aea4d2bdd13fb06e'
@@ -459,7 +458,7 @@ build() {
   # https://crbug.com/957519#c122
   CXXFLAGS=${CXXFLAGS/-Wp,-D_GLIBCXX_ASSERTIONS}
 
-  (
+  [[ ! -f ../crubit/target/release/cc_bindings_from_rs ]] && (
     cd ../crubit
     _rustc_libs="$_rust_sysroot/lib/rustlib/$(rustc --print host-tuple)/lib"
     # export RUST_MIN_STACK=134217728
